@@ -298,11 +298,6 @@ function Zoom(elem, config, wnd) {
     };
 
     var getCoordsSingle = function(t) {
-        
-        if(!t.length){
-            return
-        }
-
         var oX = elem.offsetLeft;
         var oY = elem.offsetTop;
         var x = t[0].pageX - oX;
@@ -314,6 +309,10 @@ function Zoom(elem, config, wnd) {
     };
 
     var getCoords = function(t) {
+        if(!t.length){
+            return;
+        }
+
         return t.length > 1 ? getCoordsDouble(t) : getCoordsSingle(t);
     };
 
