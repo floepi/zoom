@@ -2,6 +2,8 @@
 // Type Matrix is [ Vector, Vector ]
 // Type Transform is [ Matrix, Vector ]
 
+var zoomFactor = 1;
+
 /**
  * Multiply Scalar with Vector returns a Vector.
  *
@@ -97,8 +99,13 @@ function Transform(A, b) {
  * @return {string} CSS 2D Transform.
  */
 Transform.prototype.css = function() {
+    // exposing the zoom Factor to the class
+    
     var A = this.A;
     var b = this.b;
+
+    zoomFactor = A[0][0];
+
     return 'matrix(' + A[0][0] + ',' + A[0][1] + ',' + A[1][0] + ',' + A[1][1] +
             ',' + b[0] + ',' + b[1] + ')';
 };
@@ -268,10 +275,13 @@ function Zoom(elem, config, wnd) {
     this.srcCoords = [0, 0];
     this.destCoords = [0, 0];
     var me = this;
+    
 
     this.config = default_config(config, {
         "pan" : false,
-        "rotate" : true
+        "rotate" : true,
+        'onEnd': () => {},
+        'onStart': () => {}
     });
 
     this.wnd = wnd || window;
@@ -313,13 +323,22 @@ function Zoom(elem, config, wnd) {
 
     var handleTouchEvent = function(cb) {
         return function(evt) {
+            console.log('touch event');
+            
             if (me.isAnimationRunning){
                 return false;
             }
             var touches = evt.touches;
+            
             if (!touches) {
                 return false;
             }
+
+            // prevent panning 
+            if(touches.length === 1 && !me.config.pan){
+                return false
+            }
+
             cb(touches);
         };
     };
@@ -327,6 +346,12 @@ function Zoom(elem, config, wnd) {
     var handleZoom = handleTouchEvent(function(touches) {
         var numOfFingers = touches.length;
         if (numOfFingers !== me.curTouch){
+            if(numOfFingers > 1){
+                me.config.onStart(touches, zoomFactor)
+            } else if(numOfFingers === 0){
+                me.config.onEnd(touches, zoomFactor)
+            }
+
             me.curTouch = numOfFingers;
             me.finalize();
             if (numOfFingers !== 0) {
@@ -339,7 +364,7 @@ function Zoom(elem, config, wnd) {
     });
 
     var handleTouchStart = handleTouchEvent(function(touches) {
-        if (touches.length === 1) {
+        if (touches.length === 1 && me.config.pan) {
             if (me.mayBeDoubleTap !== null) {
                 me.wnd.clearTimeout(me.mayBeDoubleTap);
                 me.reset();
