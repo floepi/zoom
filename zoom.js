@@ -298,6 +298,11 @@ function Zoom(elem, config, wnd) {
     };
 
     var getCoordsSingle = function(t) {
+        
+        if(!t.length){
+            return
+        }
+
         var oX = elem.offsetLeft;
         var oY = elem.offsetTop;
         var x = t[0].pageX - oX;
@@ -323,8 +328,6 @@ function Zoom(elem, config, wnd) {
 
     var handleTouchEvent = function(cb) {
         return function(evt) {
-            console.log('touch event');
-            
             if (me.isAnimationRunning){
                 return false;
             }
