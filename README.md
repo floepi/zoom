@@ -1,3 +1,6 @@
+# Forked version
+Adding a start and end function to adjust the interface after zoom has been performed
+
 # Zoom it!
 Allows your users to zoom, rotate, and pan images using touch gestures.
 
