@@ -361,7 +361,10 @@ function Zoom(elem, config, wnd) {
             }
         } else {
             setDest(touches);
-            me.previewZoom();
+
+            try{
+                me.previewZoom();
+            }catch(err){}
         }
     });
 
